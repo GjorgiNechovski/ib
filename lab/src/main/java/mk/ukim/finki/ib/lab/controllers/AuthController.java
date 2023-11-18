@@ -4,9 +4,10 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
-import mk.ukim.finki.ib.lab.exceptions.EmailNotExistentException;
-import mk.ukim.finki.ib.lab.exceptions.EmailTakenException;
+import mk.ukim.finki.ib.lab.models.exceptions.*;
 import mk.ukim.finki.ib.lab.services.implementation.CookieService;
+import mk.ukim.finki.ib.lab.services.interfaces.IAuthService;
+import mk.ukim.finki.ib.lab.services.interfaces.ICookieService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,14 +15,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import mk.ukim.finki.ib.lab.services.implementation.AuthService;
 import mk.ukim.finki.ib.lab.models.User;
 import org.springframework.web.bind.annotation.RequestParam;
-import mk.ukim.finki.ib.lab.exceptions.PasswordsDontMatchException;
-import mk.ukim.finki.ib.lab.exceptions.UserNameExistsException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class AuthController {
-    private final AuthService authService;
-    private final CookieService cookieService;
+    private final IAuthService authService;
+    private final ICookieService cookieService;
 
     public AuthController(AuthService authService, CookieService cookieService) {
         this.authService = authService;
@@ -37,12 +36,16 @@ public class AuthController {
     public String login(@RequestParam String email,
                         @RequestParam String hashedPassword,
                         HttpSession httpSession,
-                        HttpServletResponse response){
+                        HttpServletResponse response,
+                        Model model){
+        User user;
 
-        User user = authService.loginUser(email, hashedPassword);
-
-        if (user == null) {
-            return "login";
+        try{
+            user = authService.loginUser(email, hashedPassword);
+        }
+        catch (UserNotActiveException e){
+            model.addAttribute("error", e.getMessage());
+            return "redirect:/login";
         }
 
         Cookie token = cookieService.generateTokenCookie();
@@ -75,7 +78,9 @@ public class AuthController {
             return "register";
         }
 
-        return "redirect:/login";
+        model.addAttribute("message", "A confirmation link has been sent to your email account");
+
+        return "redirect:/showAuthMessage";
     }
 
     @GetMapping("/sendEmail")
@@ -130,7 +135,7 @@ public class AuthController {
         return "login";
     }
 
-    @PostMapping("logout")
+    @PostMapping("/logout")
     public String logout(HttpSession session,
                          HttpServletRequest request,
                          HttpServletResponse response){
@@ -142,4 +147,14 @@ public class AuthController {
         session.removeAttribute("token");
         return "/login";
     }
+
+    @GetMapping("/confirm")
+    public String confirmRegisterToken(@RequestParam String token){
+        authService.confirmRegisterToken(token);
+
+        return "login";
+    }
+
+
+
 }

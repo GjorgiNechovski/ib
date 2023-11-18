@@ -35,9 +35,4 @@ public class SaltingService implements ISaltingService {
                 .hashString(saltedPassword, StandardCharsets.UTF_8)
                 .toString();
     }
-
-    public String extractSalt(String hashedPassword) {
-        int saltLength = 16;
-        return hashedPassword.substring(0, saltLength);
-    }
 }

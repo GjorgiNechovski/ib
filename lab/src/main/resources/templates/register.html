@@ -84,4 +84,24 @@
         passwordInput.value = '';
         repeatPassword.value = '';
     }
+
+    function validatePassword() {
+        const password = document.getElementById('password').value;
+
+        if (password.length < 8 || !/\d/.test(password)) {
+            alert("Password must be 8 characters or more and contain at least one number.");
+            return false;
+        }
+        return true;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelector('form').addEventListener('submit', function(event) {
+            if (!validatePassword()) {
+                event.preventDefault();
+            } else {
+                hashPassword();
+            }
+        });
+    });
 </script>

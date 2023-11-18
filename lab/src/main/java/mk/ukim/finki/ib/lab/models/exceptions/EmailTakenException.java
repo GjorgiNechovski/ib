@@ -1,4 +1,4 @@
-package mk.ukim.finki.ib.lab.exceptions;
+package mk.ukim.finki.ib.lab.models.exceptions;
 
 public class EmailTakenException extends Exception{
     public EmailTakenException() {

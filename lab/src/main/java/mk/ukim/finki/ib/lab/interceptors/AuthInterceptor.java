@@ -15,7 +15,6 @@ public class AuthInterceptor implements HandlerInterceptor {
 
         if(cookies != null) {
             for (Cookie cookie : cookies) {
-                System.out.println(cookie.getValue());
                 if (cookie.getValue().equals(token))
                     return true;
             }

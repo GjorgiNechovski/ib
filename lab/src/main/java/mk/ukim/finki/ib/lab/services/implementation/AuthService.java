@@ -1,11 +1,10 @@
 package mk.ukim.finki.ib.lab.services.implementation;
 
-import mk.ukim.finki.ib.lab.exceptions.EmailNotExistentException;
-import mk.ukim.finki.ib.lab.exceptions.PasswordsDontMatchException;
-import mk.ukim.finki.ib.lab.exceptions.UserNameExistsException;
-import mk.ukim.finki.ib.lab.exceptions.EmailTakenException;
+import mk.ukim.finki.ib.lab.models.exceptions.*;
 import mk.ukim.finki.ib.lab.models.User;
 import mk.ukim.finki.ib.lab.services.interfaces.IAuthService;
+import mk.ukim.finki.ib.lab.services.interfaces.IEmailService;
+import mk.ukim.finki.ib.lab.services.interfaces.ISaltingService;
 import org.springframework.stereotype.Service;
 import mk.ukim.finki.ib.lab.repository.UserRepository;
 
@@ -13,11 +12,13 @@ import mk.ukim.finki.ib.lab.repository.UserRepository;
 @Service
 public class AuthService implements IAuthService {
     private final UserRepository userRepository;
-    private final SaltingService saltingService;
+    private final ISaltingService saltingService;
+    private final IEmailService emailService;
 
-    public AuthService(UserRepository userRepository, SaltingService saltingService) {
+    public AuthService(UserRepository userRepository, SaltingService saltingService, EmailService emailService) {
         this.userRepository = userRepository;
         this.saltingService = saltingService;
+        this.emailService = emailService;
     }
 
     @Override
@@ -25,6 +26,10 @@ public class AuthService implements IAuthService {
         User user = userRepository.findByEmail(email);
 
         if (user != null) {
+
+            if (!user.isActive()){
+                throw new UserNotActiveException();
+            }
             String salt = user.getSalt();
 
             if (saltingService.validatePassword(password, user.getPassword(), salt)) {
@@ -44,7 +49,12 @@ public class AuthService implements IAuthService {
 
         User user = new User(username, name, lastName, email, hashedPassword, salt);
 
+        String confirmationToken = saltingService.generateSalt();
+        user.setConfirmationToken(confirmationToken);
+
         userRepository.save(user);
+
+        emailService.sendConfirmationEmail(email, confirmationToken);
     }
     @Override
     public void changePassword(String email, String password, String repeatPassword) throws PasswordsDontMatchException {
@@ -62,6 +72,17 @@ public class AuthService implements IAuthService {
 
         userRepository.save(user);
 
+    }
+
+    @Override
+    public void confirmRegisterToken(String token) {
+        User user = userRepository.findByConfirmationToken(token);
+
+        if (user!=null){
+            user.setActive(true);
+            user.setConfirmationToken(null);
+            userRepository.save(user);
+        }
     }
 
     public void checkEmailExistence(String email) throws EmailNotExistentException {

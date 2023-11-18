@@ -32,6 +32,12 @@ public class User {
     @Column(name = "salt")
     private String salt;
 
+    @Column(name = "confirmation_token")
+    private String confirmationToken;
+
+    @Column(name = "active")
+    private boolean active;
+
     @Column(name = "role")
     private int role;
 
