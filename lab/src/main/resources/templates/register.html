@@ -68,10 +68,16 @@
         const passwordInput = document.getElementById('password');
         const hashedPasswordInput = document.getElementById('hashedPassword');
 
-        const repeatPassword = document.getElementById('repeatPassword');
-        const hashedRepeatPassword = document.getElementById('hashedRepeatPassword');
+        const repeatPasswordInput = document.getElementById('repeatPassword');
+        const hashedRepeatPasswordInput = document.getElementById('hashedRepeatPassword');
 
         const password = passwordInput.value;
+        const repeatPassword = repeatPasswordInput.value;
+
+        if (password !== repeatPassword) {
+            alert("Passwords do not match!");
+            return false;
+        }
 
         const sha256 = new jsSHA('SHA-256', 'TEXT');
 
@@ -79,10 +85,9 @@
         hashedPasswordInput.value = sha256.getHash('HEX');
 
         sha256.update(repeatPassword);
-        hashedRepeatPassword.value = sha256.getHash('HEX');
+        hashedRepeatPasswordInput.value = sha256.getHash('HEX');
 
-        passwordInput.value = '';
-        repeatPassword.value = '';
+        return true;
     }
 
     function validatePassword() {
@@ -97,10 +102,8 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         document.querySelector('form').addEventListener('submit', function(event) {
-            if (!validatePassword()) {
+            if (!validatePassword() || !hashPassword()) {
                 event.preventDefault();
-            } else {
-                hashPassword();
             }
         });
     });

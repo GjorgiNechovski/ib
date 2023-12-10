@@ -35,8 +35,6 @@ public class AuthController {
     @PostMapping("/login")
     public String login(@RequestParam String email,
                         @RequestParam String hashedPassword,
-                        HttpSession httpSession,
-                        HttpServletResponse response,
                         Model model){
         User user;
 
@@ -45,16 +43,15 @@ public class AuthController {
         }
         catch (UserNotActiveException e){
             model.addAttribute("error", e.getMessage());
-            return "redirect:/login";
+            return "/login";
         }
 
-        Cookie token = cookieService.generateTokenCookie();
-        response.addCookie(token);
+        if(user == null){
+            model.addAttribute("error", "You have entered wrong credentials or the user doesn't exist!");
+            return "/login";
+        }
 
-        httpSession.setAttribute("token", token.getValue());
-        httpSession.setAttribute("user", user);
-
-        return "redirect:/welcome";
+        return "redirect:/codeConfirm?email=" + email;
     }
 
     @GetMapping("/register")
@@ -80,7 +77,7 @@ public class AuthController {
 
         model.addAttribute("message", "A confirmation link has been sent to your email account");
 
-        return "redirect:/showAuthMessage";
+        return "showAuthMessage";
     }
 
     @GetMapping("/sendEmail")
@@ -90,8 +87,7 @@ public class AuthController {
 
     @PostMapping("/sendEmail")
     public String checkEmail(@RequestParam String email,
-                             Model model,
-                             RedirectAttributes attributes){
+                             Model model){
         try{
             authService.checkEmailExistence(email);
         } catch (EmailNotExistentException e) {
@@ -100,25 +96,36 @@ public class AuthController {
             return "sendEmail";
         }
 
-        attributes.addAttribute("email", email);
+        authService.sendChangePasswordEmail(email);
 
-        return "redirect:/changePassword";
+        model.addAttribute("message", "An email has been sent to you to confirm your password change");
+
+        return "showAuthMessage";
     }
 
     @GetMapping("/changePassword")
-    public String getChangePasswordPage(@RequestParam String email, Model model){
+    public String getChangePasswordPage(@RequestParam String token, @RequestParam String email, Model model){
         if (email==null){
             EmailNotExistentException exception = new EmailNotExistentException();
             model.addAttribute("error", exception.getMessage());
 
             return "sendEmail";
         }
+
+        try {
+            authService.confirmChangePasswordToken(email,token);
+        } catch (UserNotExistentException | TokensDoNotMatchException e) {
+            model.addAttribute("message", e.getMessage());
+
+            return "showAuthMessage";
+        }
+
         model.addAttribute("email", email);
 
         return "changePassword";
     }
 
-    @PostMapping("/changeUserPassword")
+    @PostMapping("/changePassword")
     public String changePassword(@RequestParam String email,
                                  @RequestParam String hashedPassword,
                                  @RequestParam String hashedRepeatPassword,
@@ -131,6 +138,7 @@ public class AuthController {
 
             return "changePassword";
         }
+        model.addAttribute("message", "An authentication email has been sent to you account to change your password");
 
         return "login";
     }
@@ -152,9 +160,44 @@ public class AuthController {
     public String confirmRegisterToken(@RequestParam String token){
         authService.confirmRegisterToken(token);
 
-        return "login";
+        return "redirect:/login";
     }
 
+    @GetMapping("/codeConfirm")
+    public String getConfirmLogInPage(@RequestParam String email,
+                                      @RequestParam (required = false) String error,
+                                      Model model){
+        model.addAttribute("email",email);
+        model.addAttribute("error", error);
 
+        return "logCodeConfirm";
+    }
+
+    @PostMapping("/codeConfirm")
+    public String confirmCode(@RequestParam String email,
+                              @RequestParam int code,
+                              HttpSession httpSession,
+                              HttpServletResponse response,
+                              RedirectAttributes redirectAttributes){
+        User user;
+        user = authService.getUserByEmail(email);
+
+        try{
+            authService.checkUserCode(user, code);
+        }
+        catch (AuthCodeNotMatchingException e){
+            redirectAttributes.addAttribute("error", e.getMessage());
+
+            return "redirect:/codeConfirm?email=" + email;
+        }
+
+        Cookie token = cookieService.generateTokenCookie();
+        response.addCookie(token);
+
+        httpSession.setAttribute("token", token.getValue());
+        httpSession.setAttribute("user", user);
+
+        return "redirect:/welcome";
+    }
 
 }

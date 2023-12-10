@@ -8,6 +8,8 @@ import mk.ukim.finki.ib.lab.services.interfaces.ISaltingService;
 import org.springframework.stereotype.Service;
 import mk.ukim.finki.ib.lab.repository.UserRepository;
 
+import java.util.Random;
+
 
 @Service
 public class AuthService implements IAuthService {
@@ -33,6 +35,12 @@ public class AuthService implements IAuthService {
             String salt = user.getSalt();
 
             if (saltingService.validatePassword(password, user.getPassword(), salt)) {
+                int number = new Random().nextInt(900000) + 100000;
+
+                emailService.loginConfirmationEmail(email, number);
+
+                user.setLogInNumber(number);
+                userRepository.save(user);
                 return user;
             }
         }
@@ -75,6 +83,44 @@ public class AuthService implements IAuthService {
     }
 
     @Override
+    public void sendChangePasswordEmail(String email) {
+        User user = userRepository.findByEmail(email);
+
+        String confirmationToken = saltingService.generateSalt();
+        user.setChangePasswordToken(confirmationToken);
+
+        userRepository.save(user);
+
+        emailService.sendChangePasswordEmail(email, confirmationToken);
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public void checkUserCode(User user, int code) throws AuthCodeNotMatchingException {
+        if (user.getLogInNumber() != code)
+            throw new AuthCodeNotMatchingException();
+    }
+
+    @Override
+    public void confirmChangePasswordToken(String email, String token) throws UserNotExistentException, TokensDoNotMatchException {
+        User user = userRepository.findByEmail(email);
+
+        if (user==null){
+            throw new UserNotExistentException();
+        }
+
+        if (!user.getChangePasswordToken().equals(token)){
+            System.out.println(token + " " + user.getChangePasswordToken());
+            throw new TokensDoNotMatchException();
+        }
+    }
+
+
+    @Override
     public void confirmRegisterToken(String token) {
         User user = userRepository.findByConfirmationToken(token);
 
@@ -84,6 +130,7 @@ public class AuthService implements IAuthService {
             userRepository.save(user);
         }
     }
+
 
     public void checkEmailExistence(String email) throws EmailNotExistentException {
         if (userRepository.findByEmail(email)==null){

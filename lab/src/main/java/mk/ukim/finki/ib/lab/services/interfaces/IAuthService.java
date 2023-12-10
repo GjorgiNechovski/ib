@@ -1,11 +1,8 @@
 package mk.ukim.finki.ib.lab.services.interfaces;
 
 
-import mk.ukim.finki.ib.lab.models.exceptions.EmailNotExistentException;
-import mk.ukim.finki.ib.lab.models.exceptions.EmailTakenException;
-import mk.ukim.finki.ib.lab.models.exceptions.UserNameExistsException;
+import mk.ukim.finki.ib.lab.models.exceptions.*;
 import mk.ukim.finki.ib.lab.models.User;
-import mk.ukim.finki.ib.lab.models.exceptions.PasswordsDontMatchException;
 
 public interface IAuthService {
     User loginUser(String username, String password);
@@ -13,4 +10,8 @@ public interface IAuthService {
     void checkEmailExistence(String email) throws EmailNotExistentException;
     void changePassword(String email, String password, String repeatPassword) throws PasswordsDontMatchException;
     void confirmRegisterToken(String token);
+    void confirmChangePasswordToken(String email, String token) throws UserNotExistentException, TokensDoNotMatchException;
+    void sendChangePasswordEmail(String email);
+    User getUserByEmail(String email);
+    void checkUserCode(User user, int code) throws AuthCodeNotMatchingException;
 }

@@ -20,7 +20,7 @@
                             <form th:action="@{/login}" th:method="post" onsubmit="hashPassword()">
 
                                 <h2 class="fw-bold mb-4 text-uppercase">Login</h2>
-<!--                                <p *ngIf="showMessage" class="text-bg-danger p-2 py-4 mb-5">You have entered wrong credentials please try again!</p>-->
+                                <p th:if="${error!=null}" class="bg-danger text-light p-2 py-4 " th:text="${error}"></p>
                                 <p class="text-white-50 mb-5">Please enter your email and password</p>
 
                                 <div class="form-outline form-white mb-4">

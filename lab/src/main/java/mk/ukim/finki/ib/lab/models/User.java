@@ -35,6 +35,12 @@ public class User {
     @Column(name = "confirmation_token")
     private String confirmationToken;
 
+    @Column(name = "change_password_token")
+    private String changePasswordToken;
+
+    @Column(name = "log_in_number")
+    private int logInNumber;
+
     @Column(name = "active")
     private boolean active;
 
