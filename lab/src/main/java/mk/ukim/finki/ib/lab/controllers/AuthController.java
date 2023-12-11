@@ -197,7 +197,7 @@ public class AuthController {
         httpSession.setAttribute("token", token.getValue());
         httpSession.setAttribute("user", user);
 
-        return "redirect:/welcome";
+        return "redirect:/main";
     }
 
 }

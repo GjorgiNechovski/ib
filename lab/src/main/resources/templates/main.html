@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<form class="mb-4">
+    <h1 class="bg-danger text-center p-4 mx-2" th:if="${error} != null" th:text="${error}"></h1>
+    <div class="form-group row">
+        <div class="col-md-5">
+            <label for="search">Search by name:</label>
+            <input id="search" type="text" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label for="categoriesSelect">Select Category:</label>
+            <select id="categoriesSelect" class="form-control">
+                <option></option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label for="studioSelect">Select Print Studios:</label>
+            <select id="studioSelect" class="form-control">
+                <option></option>            </select>
+        </div>
+        <div class="col-md-1">
+            <div class="text-right">
+                <button type="button" class="btn btn-danger" >Clear Filters</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="container">
+    <div class="row">
+        <div th:each="product: ${products}" class="col-xl-2 col-lg-3 col-md-4 col-6 mb-5">
+            <div class="bg-warning p-3 text-center">
+                <div tabindex="0">
+                    <h1 th:text="${product.name}"></h1>
+                </div>
+                <span th:text="${product.price}"></span>
+                <button th:if="${user.role == T(mk.ukim.finki.ib.lab.models.enums.UserRole).USER}"
+                        class="btn btn-primary btn-sm float-end" type="button">Add To Cart</button>
+
+                <button th:unless="${user.role == T(mk.ukim.finki.ib.lab.models.enums.UserRole).USER}"
+                        class="btn btn-primary btn-sm float-end" type="button" disabled>Add To Cart</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col text-center">
+            <h1 class="">This is seen by everyone, but only default users can purchase!</h1>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

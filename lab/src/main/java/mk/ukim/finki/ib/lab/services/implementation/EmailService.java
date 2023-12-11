@@ -68,13 +68,11 @@ public class EmailService implements IEmailService {
         MimeMessage message = emailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        String confirmationLink = baseUrl + "/loginConfirm?email=" + email;
-
         String emailContent = "<p>Your code to finish your log in is: " + code + "</p>";
 
         try {
             helper.setTo(email);
-            helper.setSubject("Password Change validation");
+            helper.setSubject("Two factor authorization");
             helper.setText(emailContent, true);
 
             emailSender.send(message);

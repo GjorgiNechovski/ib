@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row flex-nowrap">
+        <div class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 bg-dark">
+            <div class="d-flex flex-column align-items-center align-items-sm-start px-3 pt-2 text-white min-vh-100">
+                <a href="/products"  class="d-flex align-items-center pb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+          <span class="fs-5 d-none d-sm-inline">
+          </span>
+                </a>
+                <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
+                    <!-- Sidebar menu items go here -->
+                    <li class="nav-item">
+                        <a href="/main" class="nav-link align-middle px-0 mb-3">
+                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                            <span class="ms-3 d-none d-sm-inline">Main Page (everyone has access)</span>
+                        </a>
+                    </li>
+                    <li th:if="${user.role == T(mk.ukim.finki.ib.lab.models.enums.UserRole).ADMIN}" class="nav-item">
+                        <a href="/userTable"  class=" nav-link mb-3  px-0">
+                            <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
+                            <span class="ms-3 d-none d-sm-inline">Change roles (Admin Page)</span>
+                        </a>
+                    </li>
+                    <li th:if="${user.role == T(mk.ukim.finki.ib.lab.models.enums.UserRole).STUDIO}" class="nav-item">
+                        <a href="/addProduct"  class=" nav-link mb-3  px-0">
+                            <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
+                            <span class="ms-3 d-none d-sm-inline">Add product (Studio Page)</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/contacts" class="nav-link align-middle px-0 mb-3">
+                            <i class="fa fa-shopping-cart" aria-hidden="true"></i>
+                            <span class="ms-3 d-none d-sm-inline">Contacts (everyone has access)</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <hr />
+
+                <div class="dropdown pb-4">
+                    <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <span class="d-none d-sm-inline mx-1" th:if="${user != null}">
+                            <span th:text="${user.getUsername()}"></span>
+                            <span th:text="' (' + ${user.role} + ')'"></span>
+                        </span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-dark text-small shadow">
+                        <li>
+                            <form action="/logout" method="post">
+                                <button type="submit" class="dropdown-item" >Log out</button>
+                            </form>
+                        </li>
+                    </ul>
+
+                </div>
+
+            </div>
+        </div>
+        <div class="col py-3">
+            <section th:include="${template}"></section>
+        </div>
+    </div>
+</div>
+</body>
+</html>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.min.js" integrity="sha384-BBtl+eGJRgqQAUMxJ7pMwbEyER4l1g+O15P+16Ep7Q9Q+zqX6gSbd85u4mG4QzX+" crossorigin="anonymous"></script>

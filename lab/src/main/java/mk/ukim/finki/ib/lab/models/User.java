@@ -2,11 +2,16 @@ package mk.ukim.finki.ib.lab.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import mk.ukim.finki.ib.lab.models.enums.UserRole;
+
+import java.util.Objects;
 
 @Entity
 @Table(name = "user")
 @Data
+@EqualsAndHashCode
 @NoArgsConstructor
 public class User {
     @Id
@@ -44,8 +49,9 @@ public class User {
     @Column(name = "active")
     private boolean active;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "role")
-    private int role;
+    private UserRole role;
 
 
     public User(String username, String name, String lastName, String email, String password, String salt) {
