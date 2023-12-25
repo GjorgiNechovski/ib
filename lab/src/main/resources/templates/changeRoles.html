@@ -11,22 +11,23 @@
         <div class="row justify-content-center">
             <div class="col-md-6 text-center">
                 <h1 th:if="${error != null}" th:text="${error}" class="text-danger"></h1>
-                <h2 class="pt-2 pb-2" th:text="${user.username}"></h2>
+                <h2 class="pt-2 pb-2" th:text="${toChangeUser.username}"></h2>
 
-                <p>Name: <span th:text="${user.name}"></span></p>
-                <p>Last Name: <span th:text="${user.lastName}"></span></p>
-                <p>Email: <span th:text="${user.email}"></span></p>
-                <p>Role: <span th:text="${user.role}"></span></p>
+                <p>Name: <span th:text="${toChangeUser.name}"></span></p>
+                <p>Last Name: <span th:text="${toChangeUser.lastName}"></span></p>
+                <p>Email: <span th:text="${toChangeUser.email}"></span></p>
+                <p>Role: <span th:text="${toChangeUser.role}"></span></p>
 
                 <form class="text-center" method="post" th:action="@{/changeRole}">
                     <span>Select the new role for the user: </span>
                     <select name="role">
                         <option th:each="role : ${T(mk.ukim.finki.ib.lab.models.enums.UserRole).values()}"
-                                th:value="${role}" th:text="${role}" th:selected="${role == user.role}"></option>
+                                th:if="${role != T(mk.ukim.finki.ib.lab.models.enums.UserRole).SUPERADMIN}"
+                                th:value="${role}" th:text="${role}" th:selected="${role == toChangeUser.role}">
+                        </option>
                     </select>
 
-
-                    <input type="hidden" name="id" th:value="${user.id}">
+                    <input type="hidden" name="id" th:value="${toChangeUser.id}">
 
                     <button type="submit" class="btn btn-warning mt-3">Change Role</button>
                 </form>

@@ -22,7 +22,7 @@
                             <span class="ms-3 d-none d-sm-inline">Main Page (everyone has access)</span>
                         </a>
                     </li>
-                    <li th:if="${user.role == T(mk.ukim.finki.ib.lab.models.enums.UserRole).ADMIN}" class="nav-item">
+                    <li th:if="${user.role == T(mk.ukim.finki.ib.lab.models.enums.UserRole).ADMIN || user.role == T(mk.ukim.finki.ib.lab.models.enums.UserRole).SUPERADMIN}" class="nav-item">
                         <a href="/userTable"  class=" nav-link mb-3  px-0">
                             <i class="fa fa-cart-arrow-down" aria-hidden="true"></i>
                             <span class="ms-3 d-none d-sm-inline">Change roles (Admin Page)</span>

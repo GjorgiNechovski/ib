@@ -11,7 +11,7 @@ public class AdminPagesInterceptor implements HandlerInterceptor {
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         UserRole role = ((User) request.getSession().getAttribute("user")).getRole();
 
-        if(role == UserRole.ADMIN){
+        if(role == UserRole.ADMIN || role==UserRole.SUPERADMIN){
             return true;
         }
 
